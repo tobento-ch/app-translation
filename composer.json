@@ -1,0 +1,50 @@
+{
+    "name": "tobento/app-translation",
+    "type": "library",
+    "description": "App translation support.",
+    "keywords": [
+        "tobento",
+        "package",
+        "app",
+        "translation",
+        "translator"
+    ],
+    "homepage": "https://www.tobento.ch",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tobias Strub",
+            "email": "info@tobento.ch",
+            "homepage": "https://www.tobento.ch"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.0",
+        "tobento/app": "^1.0",
+        "tobento/service-translation": "^1.0.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "vimeo/psalm": "^4.0",
+        "tobento/app-migration": "^1.0.2",
+        "tobento/service-filesystem": "^1.0.5",
+        "tobento/service-language": "^1.0.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tobento\\App\\Translation\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tobento\\App\\Translation\\Test\\": "tests",
+            "App\\": "build/src"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --testdox --colors=always",
+        "psalm": "vendor/bin/psalm"
+    }
+}
