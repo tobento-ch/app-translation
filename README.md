@@ -214,6 +214,7 @@ If you may want to log missing translation, you can set the ```MissingTranslatio
 use Tobento\App\AppFactory;
 use Tobento\Service\Translation\MissingTranslationHandlerInterface;
 use Tobento\Service\Translation\MissingTranslationHandler;
+use Psr\Log\LoggerInterface;
 
 // Create the app
 $app = (new AppFactory())->createApp();
@@ -226,7 +227,7 @@ $app->boot(\Tobento\App\Translation\Boot\Translation::class);
 $app->booting();
 
 $app->set(MissingTranslationHandlerInterface::class, function()) {
-    return new MissingTranslationHandler($logger); // any PSR-3 logger
+    return new MissingTranslationHandler($logger); // LoggerInterface, any PSR-3 logger
 });
 
 // Run the app
