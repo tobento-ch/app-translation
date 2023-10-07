@@ -24,6 +24,7 @@ use Tobento\Service\Language\LanguageFactory;
 use Tobento\Service\Language\Languages;
 use Tobento\Service\Language\LanguagesInterface;
 use Tobento\App\Translation\Test\Application\TranslationFilesBoot;
+use function Tobento\App\Translation\{trans};
 
 /**
  * TranslationTest
@@ -241,5 +242,20 @@ class AppTest extends TestCase
             'warenkorb custom',
             $translator->trans(message: 'cart', parameters: ['src' => 'shop'], locale: 'de')
         );
+    }
+    
+    public function testTranslateMessageFromFunction()
+    {
+        $app = $this->createApp();
+        $app->boot(Translation::class);
+        $app->booting();
+
+        $translated = trans(
+            message: 'Hi :name',
+            parameters: [':name' => 'John'],
+            locale: 'de'
+        );
+        
+        $this->assertSame('Hi John', $translated);
     }
 }
