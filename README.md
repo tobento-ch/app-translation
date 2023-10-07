@@ -147,6 +147,18 @@ class AnyServiceBoot extends Boot
 
 Check out the [**Translation Service**](https://github.com/tobento-ch/service-translation) to learn more about it.
 
+**Using the trans function**
+
+```php
+use function Tobento\App\Translation\{trans};
+
+$translated = trans(
+    message: 'Hi :name',
+    parameters: [':name' => 'John'],
+    locale: 'de'
+);
+```
+
 ### Configure Translator
 
 **Configure locale using the app language**
