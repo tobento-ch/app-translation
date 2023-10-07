@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Tobento\App\Translation\Boot;
 
 use Tobento\App\Boot;
+use Tobento\App\Boot\Functions;
 use Tobento\Service\Translation\TranslatorInterface;
 use Tobento\Service\Translation\Translator;
 use Tobento\Service\Translation\FilesResources;
@@ -34,16 +35,21 @@ class Translation extends Boot
     public const INFO = [
         'boot' => [
             'implements '.TranslatorInterface::class,
-            'adds trans app macro',
+            'adds trans app macro and function',
         ],
+    ];
+    
+    public const BOOT = [
+        Functions::class,
     ];
 
     /**
      * Boot application services.
      *
+     * @param Functions $functions
      * @return void
      */
-    public function boot(): void
+    public function boot(Functions $functions): void
     {
         // Add trans dir if not exists:
         if (! $this->app->dirs()->has('trans')) {
@@ -89,6 +95,9 @@ class Translation extends Boot
         
         // App macros.
         $this->app->addMacro('trans', [$this, 'trans']);
+        
+        // Functions:
+        $functions->register(__DIR__.'/../functions.php');
     }
     
     /**
