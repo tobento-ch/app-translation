@@ -87,8 +87,8 @@ class Translation extends Boot
             
             $languages = $this->app->get(LanguagesInterface::class);
             
-            $translator->setLocale($languages->current()->locale());
-            $translator->setLocaleFallbacks($languages->fallbacks('locale'));
+            $translator->setLocale($languages->current()->key());
+            $translator->setLocaleFallbacks($languages->fallbacks('key'));
             
             return $translator;
         });
