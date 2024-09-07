@@ -17,7 +17,7 @@ use Psr\Container\ContainerInterface;
 use Tobento\Service\HelperFunction\Functions;
 use Tobento\Service\Translation\TranslatorInterface;
 
-if (!function_exists('trans')) {
+if (!function_exists(__NAMESPACE__.'\trans')) {
     /**
      * Returns the translated message.
      *
