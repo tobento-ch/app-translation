@@ -27,7 +27,7 @@ composer require tobento/app-translation
 
 ## Requirements
 
-- PHP 8.0 or greater
+- PHP 8.4 or greater
 
 # Documentation
 
@@ -48,7 +48,7 @@ The translation boot does the following:
 use Tobento\App\AppFactory;
 
 // Create the app
-$app = (new AppFactory())->createApp();
+$app = new AppFactory()->createApp();
 
 // Add directories:
 $app->dirs()->dir(realpath(__DIR__.'/../app/'), 'app');
@@ -78,7 +78,7 @@ use Tobento\App\AppFactory;
 use Tobento\Service\Translation\TranslatorInterface;
 
 // Create the app
-$app = (new AppFactory())->createApp();
+$app = new AppFactory()->createApp();
 
 // Add directories:
 $app->dirs()->dir(realpath(__DIR__.'/../app/'), 'app');
@@ -187,7 +187,7 @@ use Tobento\App\AppFactory;
 use Tobento\Service\Translation\TranslatorInterface;
 
 // Create the app
-$app = (new AppFactory())->createApp();
+$app = new AppFactory()->createApp();
 
 // Add directories:
 $app->dirs()->dir(realpath(__DIR__.'/../app/'), 'app');
@@ -229,7 +229,7 @@ use Tobento\Service\Translation\MissingTranslationHandler;
 use Psr\Log\LoggerInterface;
 
 // Create the app
-$app = (new AppFactory())->createApp();
+$app = new AppFactory()->createApp();
 
 // Add directories:
 $app->dirs()->dir(realpath(__DIR__.'/../app/'), 'app');
@@ -349,7 +349,7 @@ class TranslationFilesMigration extends Boot
 use Tobento\App\AppFactory;
 
 // Create the app
-$app = (new AppFactory())->createApp();
+$app = new AppFactory()->createApp();
 
 // Add directories:
 $app->dirs()->dir(realpath(__DIR__.'/../app/'), 'app');
@@ -374,7 +374,7 @@ use Tobento\Service\Translation\TranslatorInterface;
 use Tobento\Service\Translation\Resource;
 
 // Create the app
-$app = (new AppFactory())->createApp();
+$app = new AppFactory()->createApp();
 
 // Add directories:
 $app->dirs()->dir(realpath(__DIR__.'/../app/'), 'app');
@@ -411,7 +411,7 @@ use Tobento\Service\Translation\TranslatorInterface;
 use Tobento\Service\Translation\Resource;
 
 // Create the app
-$app = (new AppFactory())->createApp();
+$app = new AppFactory()->createApp();
 
 // Add directories:
 $app->dirs()->dir(realpath(__DIR__.'/../app/'), 'app');
@@ -444,7 +444,7 @@ You may check out the [Add Resources](https://github.com/tobento-ch/service-tran
 use Tobento\App\AppFactory;
 
 // Create the app
-$app = (new AppFactory())->createApp();
+$app = new AppFactory()->createApp();
 
 // Add directories:
 $app->dirs()->dir(realpath(__DIR__.'/../app/'), 'app');
