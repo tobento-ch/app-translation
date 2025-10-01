@@ -26,10 +26,7 @@ use Tobento\Service\Language\LanguagesInterface;
 use Tobento\App\Translation\Test\Application\TranslationFilesBoot;
 use function Tobento\App\Translation\{trans};
 
-/**
- * TranslationTest
- */
-class AppTest extends TestCase
+class TranslationTest extends TestCase
 {
     protected function createApp(bool $deleteDir = true): AppInterface
     {
