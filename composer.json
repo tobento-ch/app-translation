@@ -1,8 +1,8 @@
 {
     "name": "tobento/app-translation",
-    "version": "2.0",
+    "version": "2.0.1",
     "type": "library",
-    "description": "App translation support.",
+    "description": "Integrates service-translation into the app and provides tools for scanning and managing translation messages.",
     "keywords": [
         "tobento",
         "package",
@@ -24,14 +24,16 @@
     "require": {
         "php": ">=8.4",
         "tobento/app": "^2.0",
-        "tobento/service-translation": "^2.0"
+        "tobento/service-translation": "^2.0",
+        "tobento/service-filesystem": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.3",
         "vimeo/psalm": "^6.13",
+        "tobento/app-console": "^2.0",
         "tobento/app-migration": "^2.0",
-        "tobento/service-filesystem": "^2.0",
-        "tobento/service-language": "^2.0"
+        "tobento/service-language": "^2.0",
+        "mockery/mockery": "^1.6"
     },
     "autoload": {
         "psr-4": {
@@ -41,7 +43,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tobento\\App\\Translation\\Test\\": "tests",
-            "App\\": "build/src"
+            "Tobento\\Service\\Console\\Test\\": "vendor/tobento/service-console/tests"
         }
     },
     "scripts": {
