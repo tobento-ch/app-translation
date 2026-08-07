@@ -15,6 +15,8 @@ namespace Tobento\App\Translation\Boot;
 
 use Tobento\App\Boot;
 use Tobento\App\Boot\Functions;
+use Tobento\App\Translation\MessageScanner;
+use Tobento\App\Translation\MessageScannerInterface;
 use Tobento\Service\Translation\TranslatorInterface;
 use Tobento\Service\Translation\Translator;
 use Tobento\Service\Translation\FilesResources;
@@ -25,6 +27,7 @@ use Tobento\Service\Translation\Modifier\ParameterReplacer;
 use Tobento\Service\Translation\Modifier\Pluralization;
 use Tobento\Service\Translation\MissingTranslationHandlerInterface;
 use Tobento\Service\Translation\MissingTranslationHandler;
+use Tobento\Service\Console\ConsoleInterface;
 use Tobento\Service\Language\LanguagesInterface;
 
 /**
@@ -93,11 +96,26 @@ class Translation extends Boot
             return $translator;
         });
         
+        $this->app->set(MessageScannerInterface::class, function(): MessageScannerInterface {
+            return new MessageScanner(
+                outputPath: $this->app->dir('root').'build/collected-messages.json'
+            )
+            ->withDefaultPatterns()
+            ->withDirectory($this->app->dir('root').'src');
+        });
+        
         // App macros.
         $this->app->addMacro('trans', [$this, 'trans']);
         
         // Functions:
         $functions->register(__DIR__.'/../functions.php');
+        
+        // Console commands:
+        $this->app->on(ConsoleInterface::class, static function(ConsoleInterface $console): void {
+            $console->addCommand(\Tobento\App\Translation\Console\ListCommand::class);
+            $console->addCommand(\Tobento\App\Translation\Console\ResourcesCommand::class);
+            $console->addCommand(\Tobento\App\Translation\Console\ScanMessagesCommand::class);
+        });
     }
     
     /**
