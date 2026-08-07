@@ -1,6 +1,6 @@
 # App Translation
 
-Translation support for the app.
+Integrates the [service-translation](https://github.com/tobento-ch/service-translation) package into your application and provides tools for scanning, managing, and customizing translation messages.
 
 ## Table of Contents
 
@@ -9,11 +9,26 @@ Translation support for the app.
 - [Documentation](#documentation)
     - [App](#app)
     - [Translation Boot](#translation-boot)
+    - [Basic Usage](#basic-usage)
         - [Translate Message](#translate-message)
-        - [Configure Translator](#configure-translator)
+    - [Configure Translator](#configure-translator)
+        - [Configure Locales](#configure-locales)
+        - [Configure Missing Translation Handler](#configure-missing-translation-handler)
+    - [Managing Translations](#managing-translations)
         - [Migrate Translations](#migrate-translations)
         - [Add Translations](#add-translations)
-        - [Customize Translations](#customize-translations)
+    - [Customize Translations](#customize-translations)
+        - [Using Resources](#using-resources)
+        - [Using Directory](#using-directory)
+        - [Using Translation Web App](#using-translation-web-app)
+    - [Scanning Messages](#scanning-messages)
+        - [Message Scanner](#message-scanner)
+            - [Default Patterns](#default-patterns)
+        - [Run Scanner](#run-scanner)
+    - [Console](#console)
+        - [List Translations Command](#list-translations-command)
+        - [Resources Command](#resouces-command)
+        - [Scan Messages Command](#scan-messages-command)
 - [Credits](#credits)
 ___
 
@@ -67,7 +82,7 @@ $app->run();
 
 By default, [Files Resources](https://github.com/tobento-ch/service-translation#files-resources) are used for the translator.
 
-### Translate Message
+## Translate Message
 
 You can translate messages in several ways:
 
@@ -159,7 +174,9 @@ $translated = trans(
 );
 ```
 
-### Configure Translator
+## Configure Translator
+
+### Configure Locales
 
 **Configure locale using the app language**
 
@@ -218,7 +235,7 @@ $app->on(TranslatorInterface::class, function(TranslatorInterface $translator) {
 $app->run();
 ```
 
-**Configure missing translations**
+### Configure Missing Translation Handler
 
 If you may want to log missing translation, you can set the ```MissingTranslationHandlerInterface::class``` implementation to fit your needs.
 
@@ -245,6 +262,10 @@ $app->set(MissingTranslationHandlerInterface::class, function()) {
 // Run the app
 $app->run();
 ```
+
+You can find more handlers in the [Missing Translation Handler](https://github.com/tobento-ch/service-translation#missing-translation-handler) section of the Translation Service.
+
+## Managing Translations
 
 ### Migrate Translations
 
@@ -397,13 +418,21 @@ $app->on(TranslatorInterface::class, function(TranslatorInterface $translator) {
 $app->run();
 ```
 
-You may check out the [Add Resources](https://github.com/tobento-ch/service-translation/tree/1.x#add-resources) section to learn more about it.
+You may check out the [Add Resources](https://github.com/tobento-ch/service-translation#add-resources) section to learn more about it.
 
-### Customize Translations
+## Customize Translations
 
-You might customize/override translations by the following ways:
+Customizing translations allows you to override existing messages or provide alternative translations without modifying the original translation files. Tobento’s translation system is fully resource-driven and priority-based, so you can extend or replace translations using resources, directories, or external tools such as the [Translation Web App](https://github.com/tobento-ch/app-translation-web).
 
-**By adding a resource with higher priority**
+### Using Resources
+
+Resources let you override or extend translations programmatically.  
+By adding a resource with a higher priority, your custom translations take precedence over the default ones.  
+You only need to specify the **translations** you want to override - resources with the same name are automatically merged.
+
+You may check out the [Add Resources](https://github.com/tobento-ch/service-translation#add-resources) section to learn more about how resources work in the underlying Translation Service.
+
+**Example**
 
 ```php
 use Tobento\App\AppFactory;
@@ -434,11 +463,15 @@ $app->on(TranslatorInterface::class, function(TranslatorInterface $translator) {
 $app->run();
 ```
 
-You may specify only the translations you want to overrride as same named resources get merged.
+### Using Directory
 
-You may check out the [Add Resources](https://github.com/tobento-ch/service-translation/tree/1.x#add-resources) section to learn more about it.
+You can also customize translations by adding a new translation directory with a higher priority.  
+Any translation file placed in this directory overrides the corresponding file in the default `trans` directory.  
+If a file does not exist in your custom directory, the default file is used automatically.
 
-**By adding a new trans dir with higher priority**
+This approach is ideal when you want to override entire translation files or maintain custom translations separately from the application's default ones.
+
+**Example**
 
 ```php
 use Tobento\App\AppFactory;
@@ -469,11 +502,215 @@ $app->boot(\Tobento\App\Translation\Boot\Translation::class);
 $app->run();
 ```
 
-Then just add the translation files you wish to override in the defined directory. If the file does not exist, the file from the default trans directory is used.
+### Using Translation Web App
 
-**Using the translation manager**
+For a more convenient workflow, you can manage, override, and publish translations using the **App Translation Web** package.  
+It provides a full browser-based interface for editing, organizing, importing, exporting, and onboarding translations across one or multiple apps.
 
-In progress...
+Check out [App Translation Web](https://github.com/tobento-ch/app-translation-web) for more details.
+
+## Scanning Messages
+
+The translation system includes a message scanner that can automatically detect translation messages in your source code.  
+This is useful when creating a new app, customizing existing features, or adding new translation messages during development.  
+It helps you keep your translation resources aligned with the messages used in your application code.
+
+The scanner analyzes your project using configurable patterns, allowing you to adapt it to different coding styles or message formats.
+
+### Message Scanner
+
+The Message Scanner is responsible for locating translation messages throughout your application.  
+It supports multiple patterns and flexible configuration so you can tailor the scanning process to your project structure.
+
+**Default Output Path and Directory**
+
+By default, the Translation Boot registers the `MessageScannerInterface` with:
+
+- a default output path  
+- a default directory (`src`)  
+- the default patterns  
+
+This ensures the scanner works out-of-the-box without requiring any command-line options.
+
+```php
+use Tobento\App\Translation\MessageScanner;
+use Tobento\App\Translation\MessageScannerInterface;
+
+$this->app->set(MessageScannerInterface::class, function(): MessageScannerInterface {
+    return new MessageScanner(
+        outputPath: $this->app->dir('root').'build/collected-messages.json'
+    )
+    ->withDefaultPatterns()
+    ->withDirectory($this->app->dir('root').'src');    
+});
+```
+
+The file `collected-messages.json` is created in your project root directory and is used when running the scanner with the `--output` option.
+
+If you want to change where scanned messages are stored see next section.
+
+**Customizing Scanner**
+
+When the [scanner is executed](#run-scanner), a default scanner instance is provided by the Translation Boot.  
+It uses the default patterns and directories defined in the boot configuration.
+
+You may customize the scanner by modifying the `MessageScannerInterface` implementation.  
+This allows you to add or override patterns, adjust directories, or extend the scanning behavior to match your application's needs.
+
+```php
+use Tobento\App\Translation\MessageScannerInterface;
+
+// using the app on method:
+$app->on(
+    MessageScannerInterface::class,
+    function(MessageScannerInterface $scanner): MessageScannerInterface {
+        return $scanner
+            ->withPattern("/->trans\(\s*'([^']+)'/m")
+            ->withOutputPath('path/to/messages.json');
+    }
+);
+```
+
+**Available Methods**
+
+All `with*` methods are immutable, returning a new scanner instance.
+
+```php
+// add a single pattern
+$scanner = $scanner->withPattern("/->trans\(\s*'([^']+)'/m");
+
+// replace all patterns
+$scanner = $scanner->withPatterns([
+    "/->trans\(\s*'([^']+)'/m",
+    "/trans\(\s*\"([^\"]+)\"/m",
+]);
+
+// add a directory to scan
+$scanner = $scanner->withDirectory('path/to/app');
+
+// replace all directories
+$scanner = $scanner->withDirectories([
+    'path/to/app',
+    'path/to/src',
+]);
+
+// set output file path
+$scanner = $scanner->withOutputPath('path/to/messages.json');
+
+// get directories
+$dirs = $scanner->getDirectories();
+
+// get patterns
+$patterns = $scanner->getPatterns();
+
+// scan and return messages
+$messages = $scanner->scan();
+
+// store messages to output path
+$scanner->storeOutputTo($messages);
+
+// get output file path
+$path = $scanner->getStoreOutputPath();
+```
+
+#### Default Patterns
+
+The default scanner provides a set of default patterns that detect common translation usages.  
+These patterns cover typical message calls and are suitable for most applications.
+
+```php
+use Tobento\App\Translation\MessageScanner;
+
+$scanner = new MessageScanner()->withDefaultPatterns();
+```
+
+The following patterns are added:
+
+```php
+// trans('...')
+"/\btrans\(\s*'([^']+)'/m",
+"/\btrans\(\s*\"([^\"]+)\"/m",
+
+// ->trans('...')
+"/->trans\(\s*'([^']+)'/m",
+"/->trans\(\s*\"([^\"]+)\"/m",
+
+// etrans('...')
+"/\betrans\(\s*'([^']+)'/m",
+"/\betrans\(\s*\"([^\"]+)\"/m",
+
+// ->etrans('...')
+"/->etrans\(\s*'([^']+)'/m",
+"/->etrans\(\s*\"([^\"]+)\"/m",
+
+// ->description('...') // ACL
+"/->description\(\s*'([^']+)'/m",
+"/->description\(\s*\"([^\"]+)\"/m",
+
+// menuLabel = '...'
+"/menuLabel\s*=\s*'([^']+)'/m",
+"/menuLabel\s*=\s*\"([^\"]+)\"/m",
+```
+
+### Run Scanner
+
+The message scanner can be executed through the console using the Scan Messages Command.  
+See the [Scan Messages Command](#scan-messages-command) for details on how to run it and how to configure directories, output formats, and storage behavior.
+
+## Console
+
+### List Translations Command
+
+If you have installed the [App Console](https://github.com/tobento-ch/app-console), you may list all available translations using the `translations:list` command.  
+This is useful for inspecting which messages exist for each locale and verifying that your translation resources are loaded correctly.
+
+**List all translations**
+
+```
+php ap translations:list --locale=de
+```
+
+**Available Options**
+
+| Option | Description |
+| ------ | ----------- |
+| `--locale=code` | Filters translations by the specified locale. |
+
+### Resources Command
+
+You may inspect all registered translation resources using the `translations:resources` command.  
+This helps you understand which resources are loaded, their priority, and how they contribute to the final translation set.
+
+**List all translation resources**
+
+```
+php ap translations:resources
+```
+
+**Available Options**
+
+| Option | Description |
+| ------ | ----------- |
+| `--locale=code` | Filters resources by the specified locale. |
+
+### Scan Messages Command
+
+You may scan your source code for translation messages using the `translations:scan` command.  
+This is useful when creating a new app, customizing existing functionality, or adding new translation messages during development.
+
+**Scan messages using the default scanner configuration**
+
+```
+php ap translations:scan
+```
+
+**Available Options**
+
+| Option | Description |
+| ------ | ----------- |
+| `--dir=path` | Directory to scan (defaults to scanner configuration). |
+| `--table` | Outputs the results as a formatted table instead of JSON. |
+| `--output` | Stores the JSON output using the scanner's configured output path. |
 
 # Credits
 
