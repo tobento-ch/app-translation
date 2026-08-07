@@ -17,6 +17,8 @@ use PHPUnit\Framework\TestCase;
 use Tobento\App\AppInterface;
 use Tobento\App\AppFactory;
 use Tobento\App\Translation\Boot\Translation;
+use Tobento\App\Translation\MessageScannerInterface;
+use Tobento\Service\Console\ConsoleInterface;
 use Tobento\Service\Translation\TranslatorInterface;
 use Tobento\Service\Translation\Resource;
 use Tobento\Service\Filesystem\Dir;
@@ -41,6 +43,7 @@ class TranslationTest extends TestCase
         
         $app->dirs()
             ->dir(realpath(__DIR__.'/../app/'), 'app')
+            ->dir(realpath(__DIR__.'/../'), 'root')
             ->dir($app->dir('app').'config', 'config', group: 'config');
         
         return $app;
@@ -51,13 +54,14 @@ class TranslationTest extends TestCase
         (new Dir())->delete(__DIR__.'/../app/');
     }
     
-    public function testTranslatorIsAvailable()
+    public function testInterfacesAreAvailable()
     {
         $app = $this->createApp();
         $app->boot(Translation::class);
         $app->booting();
         
         $this->assertInstanceof(TranslatorInterface::class, $app->get(TranslatorInterface::class));
+        $this->assertInstanceof(MessageScannerInterface::class, $app->get(MessageScannerInterface::class));
     }
     
     public function testTranslateMessage()
@@ -254,5 +258,18 @@ class TranslationTest extends TestCase
         );
         
         $this->assertSame('Hi John', $translated);
+    }
+    
+    public function testConsoleCommandsAreAvailable()
+    {
+        $app = $this->createApp();
+        $app->boot(Translation::class);
+        $app->boot(\Tobento\App\Console\Boot\Console::class);
+        $app->booting();
+        
+        $console = $app->get(ConsoleInterface::class);
+        $this->assertTrue($console->hasCommand('translations:list'));
+        $this->assertTrue($console->hasCommand('translations:resources'));
+        $this->assertTrue($console->hasCommand('translations:scan'));
     }
 }
