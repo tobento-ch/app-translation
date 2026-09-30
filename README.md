@@ -594,6 +594,15 @@ $scanner = $scanner->withDirectories([
     'path/to/src',
 ]);
 
+// add a message to be included in the scan result
+$scanner = $scanner->withMessage('Custom message');
+ 
+// replace all messages to be included in the scan result
+$scanner = $scanner->withMessages([
+    'Lorem ipsum',
+    'Another message',
+]);
+
 // set output file path
 $scanner = $scanner->withOutputPath('path/to/messages.json');
 
@@ -602,6 +611,9 @@ $dirs = $scanner->getDirectories();
 
 // get patterns
 $patterns = $scanner->getPatterns();
+
+// get messages
+$messages = $scanner->getMessages();
 
 // scan and return messages
 $messages = $scanner->scan();
@@ -650,6 +662,10 @@ The following patterns are added:
 // menuLabel = '...'
 "/menuLabel\s*=\s*'([^']+)'/m",
 "/menuLabel\s*=\s*\"([^\"]+)\"/m",
+
+// HttpException(message: '...')
+"/HttpException\([^)]*?message:\s*'([^']+)'/ms",
+"/HttpException\([^)]*?message:\s*\"([^\"]+)\"/ms",
 ```
 
 ### Run Scanner
