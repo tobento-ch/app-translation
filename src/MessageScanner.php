@@ -23,11 +23,13 @@ class MessageScanner implements MessageScannerInterface
      * @param string $outputPath
      * @param array<array-key, string> $patterns
      * @param array $directories
+     * @param array<array-key, string> $messages
      */
     public function __construct(
         protected string $outputPath,
         protected array $patterns = [],
         protected array $directories = [],
+        protected array $messages = [],
     ) {
         $this->directories = array_map(
             fn(string $d) => rtrim($d, '/'),
@@ -66,6 +68,10 @@ class MessageScanner implements MessageScannerInterface
             // menuLabel = '...'
             "/menuLabel\s*=\s*'([^']+)'/m",
             "/menuLabel\s*=\s*\"([^\"]+)\"/m",
+            
+            // HttpException(message: '...')
+            "/HttpException\([^)]*?message:\s*'([^']+)'/ms",
+            "/HttpException\([^)]*?message:\s*\"([^\"]+)\"/ms",
         ]);
     }
     
@@ -123,6 +129,32 @@ class MessageScanner implements MessageScannerInterface
         );
         return $clone;
     }
+    
+    /**
+     * Add a message to be included in the scan result.
+     *
+     * @param string $message
+     * @return static
+     */
+    public function withMessage(string $message): static
+    {
+        $clone = clone $this;
+        $clone->messages[] = $message;
+        return $clone;
+    }
+
+    /**
+     * Replace all messages to be included in the scan result.
+     *
+     * @param array<array-key, string> $messages
+     * @return static
+     */
+    public function withMessages(array $messages): static
+    {
+        $clone = clone $this;
+        $clone->messages = $messages;
+        return $clone;
+    }
 
     /**
      * Set the output file path.
@@ -156,6 +188,16 @@ class MessageScanner implements MessageScannerInterface
     {
         return $this->patterns;
     }
+    
+    /**
+     * Get messages.
+     *
+     * @return array<array-key, string>
+     */
+    public function getMessages(): array
+    {
+        return $this->messages;
+    }
 
     /**
      * Scan and return messages.
@@ -184,6 +226,10 @@ class MessageScanner implements MessageScannerInterface
                     }
                 }
             }
+        }
+        
+        foreach ($this->messages as $message) {
+            $messages[$message] = $message;
         }
 
         ksort($messages, SORT_NATURAL | SORT_FLAG_CASE);
