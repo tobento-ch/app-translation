@@ -1,6 +1,6 @@
 {
     "name": "tobento/app-translation",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "type": "library",
     "description": "Integrates service-translation into the app and provides tools for scanning and managing translation messages.",
     "keywords": [
